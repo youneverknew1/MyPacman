@@ -1,8 +1,9 @@
 #include "../include/entity.h"
+#include "../include/map.h"
 
 Player pacman;
 void setup_player(){
-    pacman.x=tile_size;
+    pacman.x=tile_size; //st (1,1)
     pacman.y=tile_size;
     pacman.dx=0;
     pacman.dy=0;
@@ -11,8 +12,19 @@ void setup_player(){
 
 void move_player(){
     float speed=2.0f;
-    pacman.x=pacman.x+(pacman.dx*speed);
-    pacman.y=pacman.y+(pacman.dy*speed);
+
+    float nextX=pacman.x+(pacman.dx*speed); //pos
+    float nextY=pacman.y+(pacman.dy*speed);
+    int col=(int)(nextX+16)/tile_size;
+    int row=(int)(nextY+16)/tile_size;
+
+    if(game_map[row][col]!=1){
+        pacman.x=nextX;
+        pacman.y=nextY;
+    }else{
+        pacman.dx=0;
+        pacman.dy=0;
+    }
 }
 
 void draw_player(SDL_Renderer* renderer){
