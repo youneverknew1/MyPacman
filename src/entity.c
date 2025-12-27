@@ -7,7 +7,6 @@ void setup_player(){
     pacman.y=tile_size;
     pacman.dx=0;
     pacman.dy=0;
-    //changed it to test github
 }
 
 void move_player(){
