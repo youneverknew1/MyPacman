@@ -50,6 +50,16 @@ void move_player()
         }else{
             break;
         }
+        //scoring
+        int current_col=((int)pacman.x+16)/32;
+        int current_row=((int)pacman.y+16)/32;
+        if(current_row>=0 && current_row<map_rows && current_col>=0 && current_col<map_cols){
+            if(game_map[current_row][current_col]==2){
+                game_map[current_row][current_col]=0;
+                score+=10;
+            }
+        }
+
     }
 }
 

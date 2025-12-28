@@ -49,6 +49,11 @@ int main(int argc, char *argv[])
             }
         }
         move_player();
+
+        //display 
+        char title[64];
+        snprintf(title,sizeof(title),"Score : %d",score);
+        SDL_SetWindowTitle(window,title);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         draw_map(renderer);
