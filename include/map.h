@@ -1,15 +1,17 @@
-#ifndef map_h
-#define map_h
+#ifndef MAP_H
+#define MAP_H
 
-#include"constants.h"
-#include<stdbool.h>
-#include<SDL2/SDL.h>
+#include <SDL2/SDL.h>
+#include <stdbool.h>
 
-extern int game_map[map_rows][map_cols];
+// This "prototype" tells other files that check_wall exists
+bool check_wall(int x, int y);
 
+// Other map functions
 bool load_map(const char* filename);
-
 void draw_map(SDL_Renderer* renderer);
 
-extern int score;
+// Global map data
+extern int game_map[20][19]; 
+
 #endif

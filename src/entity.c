@@ -10,7 +10,6 @@ Ghost blinky;
 
 void setup_player()
 {
-    // SWAPPED: Place Pacman in the middle of the maze (Tile 9, 10)
     pacman.x = 32.0f * 9; 
     pacman.y = 32.0f * 10;
     pacman.dx = 0;
@@ -21,7 +20,7 @@ void setup_player()
 
 void setup_ghost(){
     srand(time(NULL));
-    // SWAPPED: Place ghost in the top-left corner (Tile 1, 1)
+    
     blinky.x = 32.0f; 
     blinky.y = 32.0f;
     blinky.dx = 1; // Start moving right
