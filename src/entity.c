@@ -1,7 +1,10 @@
 #include "../include/entity.h"
 #include "../include/map.h"
+#include <time.h>
+#include <stdlib.h>
 
 Player pacman;
+Ghost blinky;
 
 void setup_player()
 {
@@ -12,7 +15,15 @@ void setup_player()
     pacman.next_dx = 0;
     pacman.next_dy = 0;
 }
-
+void setup_ghost(){
+    srand(time(NULL));
+    // Place ghost in the middle of the maze (Tile 9, 9)
+    blinky.x = 32.0f * 9; 
+    blinky.y = 32.0f * 9;
+    blinky.dx = 1; // Start moving right
+    blinky.dy = 0;
+    blinky.color = (SDL_Color){255, 0, 0, 255};
+}
 
 bool check_wall(int x, int y)
 {
@@ -62,10 +73,40 @@ void move_player()
 
     }
 }
+void move_ghost() {
+    int speed = 2; 
+    for (int i = 0; i < speed; i++) {
+        // If the ghost is perfectly on a tile, he might change direction
+        if ((int)blinky.x % 32 == 0 && (int)blinky.y % 32 == 0) {
+            int dirs[4][2] = {{0,-1}, {0,1}, {-1,0}, {1,0}};
+            
+            // If he hits a wall OR by a random 10% chance at an intersection
+            if (check_wall((int)blinky.x + blinky.dx, (int)blinky.y + blinky.dy) || rand() % 10 == 0) {
+                // Try to find a new random valid direction
+                int r = rand() % 4;
+                if (!check_wall((int)blinky.x + dirs[r][0], (int)blinky.y + dirs[r][1])) {
+                    blinky.dx = dirs[r][0];
+                    blinky.dy = dirs[r][1];
+                }
+            }
+        }
+
+        if (!check_wall((int)blinky.x + blinky.dx, (int)blinky.y + blinky.dy)) {
+            blinky.x += blinky.dx;
+            blinky.y += blinky.dy;
+        }
+    }
+}
 
 void draw_player(SDL_Renderer *renderer)
 {
     SDL_Rect rect = {(int)pacman.x, (int)pacman.y, 32, 32};
     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+    SDL_RenderFillRect(renderer, &rect);
+}
+void draw_ghost(SDL_Renderer *renderer) {
+    SDL_Rect rect = {(int)blinky.x, (int)blinky.y, 32, 32};
+    // Use the color defined in setup_ghost
+    SDL_SetRenderDrawColor(renderer, blinky.color.r, blinky.color.g, blinky.color.b, 255); 
     SDL_RenderFillRect(renderer, &rect);
 }
