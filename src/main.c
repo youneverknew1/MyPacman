@@ -1,31 +1,51 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <math.h>
 #include "../include/constants.h"
 #include "../include/map.h"
 #include "../include/entity.h"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     load_map("assets/map.txt");
     SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_Window* window=SDL_CreateWindow("Sadid's Pacman",100,100,screen_width,screen_height,0);
-    SDL_Renderer* renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
+    SDL_Window *window = SDL_CreateWindow("Sadid's Pacman", 100, 100, screen_width, screen_height, 0);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     setup_player();
     bool running = true;
     SDL_Event event;
 
-    while (running) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) running = false;
-
-            //movement
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_UP)    { pacman.dx = 0;  pacman.dy = -1; }
-                if (event.key.keysym.sym == SDLK_DOWN)  { pacman.dx = 0;  pacman.dy = 1;  }
-                if (event.key.keysym.sym == SDLK_LEFT)  { pacman.dx = -1; pacman.dy = 0;  }
-                if (event.key.keysym.sym == SDLK_RIGHT) { pacman.dx = 1;  pacman.dy = 0;  }
+    while (running){
+        while (SDL_PollEvent(&event)){
+            if (event.type == SDL_QUIT)
+                running = false;
+            // movement
+            if (event.type == SDL_KEYDOWN){
+                switch (event.key.keysym.sym)
+                {
+                case SDLK_UP:
+                    pacman.next_dx = 0;
+                    pacman.next_dy = -1;
+                    break;
+                case SDLK_DOWN:
+                    pacman.next_dx = 0;
+                    pacman.next_dy = 1;
+                    break;
+                case SDLK_LEFT:
+                    pacman.next_dx = -1;
+                    pacman.next_dy = 0;
+                    break;
+                case SDLK_RIGHT:
+                    pacman.next_dx = 1;
+                    pacman.next_dy = 0;
+                    break;
+                case SDLK_ESCAPE:
+                    running = false;
+                    break;
+                }
             }
         }
         move_player();

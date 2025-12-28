@@ -13,7 +13,6 @@ bool load_map(const char* filename) {
         printf("Error: Could not open %s\n", filename);
         return false;
     }
-
     for (int i = 0; i < map_rows; i++) {
         for (int j = 0; j < map_cols; j++) {
             if (fscanf(file, "%d", &game_map[i][j]) != 1) {
@@ -30,8 +29,8 @@ void draw_map(SDL_Renderer* renderer) {
     for (int i = 0; i < map_rows; i++) {
         for (int j = 0; j < map_cols; j++) {
             SDL_Rect tile = {
-                j * tile_size, // x position
-                i * tile_size, // y position
+                j * tile_size, // x pos
+                i * tile_size, // y pos
                 tile_size, 
                 tile_size
             };

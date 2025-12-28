@@ -1,17 +1,19 @@
-#ifndef entity_h
-#define entity_h
-#include<SDL2/SDL.h>
-#include "constants.h"
+#ifndef ENTITY_H
+#define ENTITY_H
 
-typedef struct{
-    float x;
-    float y;
-    int dx;
-    int dy;
+#include <SDL2/SDL.h>
+#include <stdbool.h>
+
+typedef struct {
+    float x, y;       
+    int dx, dy; 
+    int next_dx, next_dy; 
 } Player;
 
 extern Player pacman;
+
 void setup_player();
 void move_player();
 void draw_player(SDL_Renderer* renderer);
+
 #endif
