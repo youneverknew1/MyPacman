@@ -1,6 +1,7 @@
 #include "../include/entity.h"
 #include "../include/map.h"
 #include "../include/constants.h"
+#include "../include/ghost_ai.h"
 #include <time.h>
 #include <stdlib.h>
 
@@ -79,17 +80,12 @@ void move_player()
 void move_ghost() {
     int speed = 2; 
     for (int i = 0; i < speed; i++) {
+        // Check for direction change only at tile intersections
         if ((int)blinky.x % 32 == 0 && (int)blinky.y % 32 == 0) {
-            int dirs[4][2] = {{0,-1}, {0,1}, {-1,0}, {1,0}};
-            
-            // Logic: Change direction if hitting wall OR random choice at intersection
-            if (check_wall((int)blinky.x + blinky.dx, (int)blinky.y + blinky.dy) || rand() % 10 == 0) {
-                int r = rand() % 4;
-                if (!check_wall((int)blinky.x + dirs[r][0], (int)blinky.y + dirs[r][1])) {
-                    blinky.dx = dirs[r][0];
-                    blinky.dy = dirs[r][1];
-                }
-            }
+            int new_dx, new_dy;
+            get_smart_direction(&blinky, &pacman, &new_dx, &new_dy);
+            blinky.dx = new_dx;
+            blinky.dy = new_dy;
         }
 
         if (!check_wall((int)blinky.x + blinky.dx, (int)blinky.y + blinky.dy)) {
@@ -98,7 +94,6 @@ void move_ghost() {
         }
     }
 }
-
 void draw_player(SDL_Renderer *renderer)
 {
     SDL_Rect rect = {(int)pacman.x, (int)pacman.y, 32, 32};
