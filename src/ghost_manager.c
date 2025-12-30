@@ -6,16 +6,20 @@
 Ghost ghosts[GHOST_COUNT];
 
 void setup_all_ghosts() {
-    int pos[GHOST_COUNT][2] = {{1,1}, {17,1}, {1,18}, {17,18}};
+    int pos[GHOST_COUNT][2]={
+        {1,1}, 
+        {17,18}
+    };
     SDL_Color colors[GHOST_COUNT] = {
-        {255, 0, 0, 255}, {255, 182, 255, 255}, 
-        {0, 255, 255, 255}, {255, 182, 85, 255}
+        {255, 0, 0, 255},   //red
+        {255, 182, 85, 255} //orange
     };
 
     for (int i = 0; i < GHOST_COUNT; i++) {
-        ghosts[i].x = pos[i][0] * 32;
-        ghosts[i].y = pos[i][1] * 32;
-        ghosts[i].dx = 0; ghosts[i].dy = 0;
+        ghosts[i].x = (float)pos[i][0] * 32;
+        ghosts[i].y = (float)pos[i][1] * 32;
+        ghosts[i].dx = 0;
+        ghosts[i].dy = 0;
         ghosts[i].color = colors[i];
     }
 }
@@ -23,7 +27,7 @@ void setup_all_ghosts() {
 void move_all_ghosts() {
     for (int i = 0; i < GHOST_COUNT; i++) {
         if ((int)ghosts[i].x % 32 == 0 && (int)ghosts[i].y % 32 == 0) {
-            get_smart_direction(&ghosts[i], &pacman, &ghosts[i].dx, &ghosts[i].dy);
+            get_smart_direction(i, &ghosts[i].dx, &ghosts[i].dy);
         }
         ghosts[i].x += ghosts[i].dx * 2; // Speed 2
         ghosts[i].y += ghosts[i].dy * 2;
@@ -40,8 +44,10 @@ void draw_all_ghosts(SDL_Renderer* renderer) {
 
 bool check_pacman_collision() {
     for (int i = 0; i < GHOST_COUNT; i++) {
-        if (abs((int)pacman.x - (int)ghosts[i].x) < 20 && abs((int)pacman.y - (int)ghosts[i].y) < 20)
+        if (abs((int)pacman.x - (int)ghosts[i].x) < 20 && 
+            abs((int)pacman.y - (int)ghosts[i].y) < 20){
             return true;
+        }
     }
     return false;
 }

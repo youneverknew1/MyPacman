@@ -18,15 +18,15 @@ void setup_player()
     pacman.next_dy = 0;
 }
 
-void setup_ghost(){
-    srand(time(NULL));
+// void setup_ghost(){
+//     srand(time(NULL));
     
-    blinky.x = 32.0f; 
-    blinky.y = 32.0f;
-    blinky.dx = 1; // Start moving right
-    blinky.dy = 0;
-    blinky.color = (SDL_Color){255, 0, 0, 255};
-}
+//     blinky.x = 32.0f; 
+//     blinky.y = 32.0f;
+//     blinky.dx = 1; // Start moving right
+//     blinky.dy = 0;
+//     blinky.color = (SDL_Color){255, 0, 0, 255};
+// }
 
 bool check_wall(int x, int y)
 {
@@ -76,23 +76,23 @@ void move_player()
     }
 }
 
-void move_ghost() {
-    int speed = 2; 
-    for (int i = 0; i < speed; i++) {
-        // Check for direction change only at tile intersections
-        if ((int)blinky.x % 32 == 0 && (int)blinky.y % 32 == 0) {
-            int new_dx, new_dy;
-            get_smart_direction(&blinky, &pacman, &new_dx, &new_dy);
-            blinky.dx = new_dx;
-            blinky.dy = new_dy;
-        }
+// void move_ghost() {
+//     int speed = 2; 
+//     for (int i = 0; i < speed; i++) {
+//         // Check for direction change only at tile intersections
+//         if ((int)blinky.x % 32 == 0 && (int)blinky.y % 32 == 0) {
+//             int new_dx, new_dy;
+//             get_smart_direction(&blinky, &pacman, &new_dx, &new_dy);
+//             blinky.dx = new_dx;
+//             blinky.dy = new_dy;
+//         }
 
-        if (!check_wall((int)blinky.x + blinky.dx, (int)blinky.y + blinky.dy)) {
-            blinky.x += (float)blinky.dx;
-            blinky.y += (float)blinky.dy;
-        }
-    }
-}
+//         if (!check_wall((int)blinky.x + blinky.dx, (int)blinky.y + blinky.dy)) {
+//             blinky.x += (float)blinky.dx;
+//             blinky.y += (float)blinky.dy;
+//         }
+//     }
+// }
 void draw_player(SDL_Renderer *renderer)
 {
     SDL_Rect rect = {(int)pacman.x, (int)pacman.y, 32, 32};
@@ -100,8 +100,8 @@ void draw_player(SDL_Renderer *renderer)
     SDL_RenderFillRect(renderer, &rect);
 }
 
-void draw_ghost(SDL_Renderer *renderer) {
-    SDL_Rect rect = {(int)blinky.x, (int)blinky.y, 32, 32};
-    SDL_SetRenderDrawColor(renderer, blinky.color.r, blinky.color.g, blinky.color.b, 255); 
-    SDL_RenderFillRect(renderer, &rect);
-}
+// void draw_ghost(SDL_Renderer *renderer) {
+//     SDL_Rect rect = {(int)blinky.x, (int)blinky.y, 32, 32};
+//     SDL_SetRenderDrawColor(renderer, blinky.color.r, blinky.color.g, blinky.color.b, 255); 
+//     SDL_RenderFillRect(renderer, &rect);
+// }

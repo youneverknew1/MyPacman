@@ -1,32 +1,31 @@
 #include "../include/ghost_ai.h"
-#include "../include/map.h"      // This is the line that fixes your error
-#include <math.h>
-#include <stdbool.h>
+#include "../include/ghost_manager.h"
+#include "../include/map.h"
 
-void get_smart_direction(Ghost *ghost, Player *target, int *out_dx, int *out_dy) {
-    int dirs[4][2] = {{0,-1}, {0,1}, {-1,0}, {1,0}}; // Up, Down, Left, Right
+void get_smart_direction(int idx, int *ox, int *oy) {
+    int direction[4][2] = {{0,-1}, {0,1}, {-1,0}, {1,0}};
     float min_dist = 1e9f;
-    int best_dir = -1;
+    int bestIdx = -1;
 
-    for (int i = 0; i < 4; i++) {
-        int tx = (int)ghost->x + (dirs[i][0] * 32);
-        int ty = (int)ghost->y + (dirs[i][1] * 32);
+    for (int j = 0; j < 4; j++) {
+        int testX = (int)ghosts[idx].x + direction[j][0] * 32;
+        int testY = (int)ghosts[idx].y + direction[j][1] * 32;
 
-        // Now the compiler will know what check_wall is
-        if (check_wall(tx, ty)) continue;
-        
-        // Prevent 180-degree turns
-        if (dirs[i][0] == -ghost->dx && dirs[i][1] == -ghost->dy) continue;
+        if (check_wall(testX, testY)) continue;
+        if (direction[j][0] == -ghosts[idx].dx && direction[j][1] == -ghosts[idx].dy) continue;
 
-        float dist = pow(target->x - tx, 2) + pow(target->y - ty, 2);
+        float diffX = pacman.x - testX;
+        float diffY = pacman.y - testY;
+        float dist = (diffX * diffX) + (diffY * diffY);
+
         if (dist < min_dist) {
             min_dist = dist;
-            best_dir = i;
+            bestIdx = j;
         }
     }
 
-    if (best_dir != -1) {
-        *out_dx = dirs[best_dir][0];
-        *out_dy = dirs[best_dir][1];
+    if (bestIdx != -1) {
+        *ox = direction[bestIdx][0];
+        *oy = direction[bestIdx][1];
     }
 }

@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include "entity.h"
 
-#define GHOST_COUNT 4
+#define GHOST_COUNT 2
 
 extern Ghost ghosts[GHOST_COUNT];
 

@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 
         draw_map(ren);
         draw_player(ren);
-        draw_all_ghosts(ren); // Always draw ghosts AFTER the map
+        draw_all_ghosts(ren);
         draw_ui_score(ren, score, 10, 10);
 
         if (state == MENU) draw_start_screen(ren);
