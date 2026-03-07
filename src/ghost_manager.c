@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "../include/constants.h"
 
+
 Ghost ghosts[GHOST_COUNT];
 
 void setup_all_ghosts() {
