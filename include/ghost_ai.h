@@ -2,6 +2,5 @@
 #define GHOST_AI_H
 #include "entity.h"
 
-void get_smart_direction(int idx, int *out_dx, int *out_dy);
-
+void get_smart_direction(int idx, int tx, int ty, int *ox, int *oy);
 #endif

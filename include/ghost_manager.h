@@ -2,9 +2,16 @@
 #define GHOST_MANAGER_H
 
 #include <SDL2/SDL.h>
-#include "entity.h"
+#include <stdbool.h>
 
-#define GHOST_COUNT 2
+#define GHOST_COUNT 3
+#define GHOST_SPEED 2
+
+typedef struct {
+    float x, y;
+    int dx, dy;
+    SDL_Color color;
+} Ghost;
 
 extern Ghost ghosts[GHOST_COUNT];
 

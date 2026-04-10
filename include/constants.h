@@ -1,9 +1,19 @@
-#ifndef constants_h
-#define constants_h
-#define tile_size 32
-#define map_rows 20
-#define map_cols 19
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
-#define screen_width (map_cols*tile_size)
-#define screen_height (map_rows*tile_size)
+#include <SDL2/SDL.h>
+#include <stdbool.h>
+
+#define TILE_SIZE 32
+
+extern int current_rows;
+extern int current_cols;
+
+#define SCREEN_WIDTH (current_cols * TILE_SIZE)
+#define SCREEN_HEIGHT (current_rows * TILE_SIZE)
+
+typedef enum { STATE_MENU, STATE_PLAY, STATE_OVER } GameState;
+extern GameState state;
+extern int score;
+
 #endif

@@ -1,25 +1,20 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <SDL2/SDL.h>
 #include <stdbool.h>
+#include <SDL2/SDL.h>
 
+#define PACMAN_SPEED 2
 typedef struct {
     float x, y;
     int dx, dy;
     int next_dx, next_dy;
 } Player;
 
-typedef struct {
-    float x, y;
-    int dx, dy;
-    SDL_Color color;
-} Ghost;
-
 extern Player pacman;
-extern int score;
 
-void setup_player();
+// This line tells ALL files that check_wall exists!
+bool check_wall(int x, int y); 
 void move_player();
 void draw_player(SDL_Renderer* renderer);
 

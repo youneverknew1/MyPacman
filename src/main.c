@@ -5,44 +5,70 @@
 #include "../include/ghost_manager.h"
 #include "../include/ui.h"
 
-typedef enum { MENU, PLAY, OVER } State;
-State state = MENU;
+GameState state = STATE_MENU;
+SDL_Window* win = NULL;
 
+void spawn_entities() {
+    int g_idx = 0;
+    for (int r = 0; r < current_rows; r++) {
+        for (int c = 0; c < current_cols; c++) {
+            if (game_map[r][c] == 3) {
+                pacman.x = (float)c * TILE_SIZE;
+                pacman.y = (float)r * TILE_SIZE;
+                game_map[r][c] = 0; // Clear spawn point
+            } else if (game_map[r][c] == 4) {
+                if (g_idx < GHOST_COUNT) {
+                    ghosts[g_idx].x = (float)c * TILE_SIZE;
+                    ghosts[g_idx].y = (float)r * TILE_SIZE;
+                    game_map[r][c] = 0; // Clear spawn point
+                    g_idx++;
+                }
+            }
+        }
+    }
+}
 void reset() {
-    load_map("assets/map.txt");
-    setup_player();
-    setup_all_ghosts();
-    score = 0;
+    if (load_map("assets/map.txt")) {
+        SDL_SetWindowSize(win, current_cols * TILE_SIZE, current_rows * TILE_SIZE);
+        setup_all_ghosts(); 
+        spawn_entities();
+        pacman.dx = pacman.dy = pacman.next_dx = pacman.next_dy = 0;
+        score = 0;
+    }
 }
 
 int main(int argc, char* argv[]) {
-    SDL_Init(SDL_INIT_VIDEO);
-    SDL_Window* win = SDL_CreateWindow("Pacman", 100, 100, screen_width, screen_height, 0);
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) return 1;
+
+    win = SDL_CreateWindow("Pacman", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, 0);
     SDL_Renderer* ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
     
     reset();
     bool run = true;
-    SDL_Event e;
+    SDL_Event event;
 
     while (run) {
-        while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) run = false;
-            if (e.type == SDL_KEYDOWN) {
-                if (state == MENU && e.key.keysym.sym == SDLK_SPACE) state = PLAY;
-                if (state == OVER && e.key.keysym.sym == SDLK_r) { reset(); state = PLAY; }
-                if (state == PLAY) {
-                    if (e.key.keysym.sym == SDLK_UP) { pacman.next_dx = 0; pacman.next_dy = -1; }
-                    if (e.key.keysym.sym == SDLK_DOWN) { pacman.next_dx = 0; pacman.next_dy = 1; }
-                    if (e.key.keysym.sym == SDLK_LEFT) { pacman.next_dx = -1; pacman.next_dy = 0; }
-                    if (e.key.keysym.sym == SDLK_RIGHT) { pacman.next_dx = 1; pacman.next_dy = 0; }
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) run = false;
+            if (event.type == SDL_KEYDOWN) {
+                if (state == STATE_MENU && event.key.keysym.sym == SDLK_SPACE) state = STATE_PLAY;
+                if (state == STATE_OVER && event.key.keysym.sym == SDLK_r) { 
+                    reset(); 
+                    state = STATE_PLAY; 
+                }
+                if (state == STATE_PLAY) {
+                    if (event.key.keysym.sym == SDLK_UP)    { pacman.next_dx = 0;  pacman.next_dy = -1; }
+                    if (event.key.keysym.sym == SDLK_DOWN)  { pacman.next_dx = 0;  pacman.next_dy = 1;  }
+                    if (event.key.keysym.sym == SDLK_LEFT)  { pacman.next_dx = -1; pacman.next_dy = 0;  }
+                    if (event.key.keysym.sym == SDLK_RIGHT) { pacman.next_dx = 1;  pacman.next_dy = 0;  }
                 }
             }
         }
 
-        if (state == PLAY) {
+        if (state == STATE_PLAY) {
             move_player();
             move_all_ghosts();
-            if (check_pacman_collision()) state = OVER;
+            if (check_pacman_collision()) state = STATE_OVER;
         }
 
         SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
@@ -51,15 +77,17 @@ int main(int argc, char* argv[]) {
         draw_map(ren);
         draw_player(ren);
         draw_all_ghosts(ren);
-        draw_ui_score(ren, score, 10, 10);
+        draw_ui_score(ren, score, 20, 10); // Moved slightly for better visibility
 
-        if (state == MENU) draw_start_screen(ren);
-        if (state == OVER) draw_game_over_screen(ren, score);
+        if (state == STATE_MENU) draw_start_screen(ren);
+        if (state == STATE_OVER) draw_game_over_screen(ren, score);
 
         SDL_RenderPresent(ren);
         SDL_Delay(16);
     }
-
+    
+    SDL_DestroyRenderer(ren);
+    SDL_DestroyWindow(win);
     SDL_Quit();
     return 0;
 }
