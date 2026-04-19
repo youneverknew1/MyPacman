@@ -1,12 +1,19 @@
 #include "../include/entity.h"
 #include "../include/map.h"
 #include "../include/constants.h"
-#include "../include/entity.h"
+#include <SDL2/SDL.h>
 #include <stdbool.h>
 
 Player pacman; 
 
 bool check_wall(int x, int y) {
+    if (x < 0 || y < 0 || 
+        (x + TILE_SIZE) > (current_cols * TILE_SIZE) || 
+        (y + TILE_SIZE) > (current_rows * TILE_SIZE)) {
+        return true; 
+    }
+
+    // GRID COORDINATE MATH
     int left = x / TILE_SIZE;
     int right = (x + TILE_SIZE - 1) / TILE_SIZE;
     int top = y / TILE_SIZE;
@@ -18,6 +25,7 @@ bool check_wall(int x, int y) {
     return (game_map[top][left] == 1 || game_map[top][right] == 1 ||
             game_map[bottom][left] == 1 || game_map[bottom][right] == 1);
 }
+
 void move_player() {
     for (int i = 0; i < PACMAN_SPEED; i++) {
         if ((int)pacman.x % TILE_SIZE == 0 && (int)pacman.y % TILE_SIZE == 0) {
@@ -26,14 +34,17 @@ void move_player() {
                 pacman.dy = pacman.next_dy;
             }
         }
-        
         if (!check_wall((int)pacman.x + pacman.dx, (int)pacman.y + pacman.dy)) {
             pacman.x += pacman.dx;
             pacman.y += pacman.dy;
         }
 
-        int col = ((int)pacman.x + 16) / TILE_SIZE;
-        int row = ((int)pacman.y + 16) / TILE_SIZE;
+        // Pellet eat
+        int centerX = (int)pacman.x + TILE_SIZE / 2;
+        int centerY = (int)pacman.y + TILE_SIZE / 2;
+        int col = centerX / TILE_SIZE;
+        int row = centerY / TILE_SIZE;
+        
         if (row >= 0 && row < current_rows && col >= 0 && col < current_cols) {
             if (game_map[row][col] == 2) {
                 game_map[row][col] = 0;
