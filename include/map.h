@@ -8,5 +8,6 @@ extern int** game_map;
 
 bool load_map(const char* filename);
 void draw_map(SDL_Renderer* renderer);
+// void spawn_power_pellet();
 
 #endif

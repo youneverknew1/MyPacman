@@ -13,7 +13,6 @@ bool check_wall(int x, int y) {
         return true; 
     }
 
-    // GRID COORDINATE MATH
     int left = x / TILE_SIZE;
     int right = (x + TILE_SIZE - 1) / TILE_SIZE;
     int top = y / TILE_SIZE;
@@ -39,11 +38,8 @@ void move_player() {
             pacman.y += pacman.dy;
         }
 
-        // Pellet eat
-        int centerX = (int)pacman.x + TILE_SIZE / 2;
-        int centerY = (int)pacman.y + TILE_SIZE / 2;
-        int col = centerX / TILE_SIZE;
-        int row = centerY / TILE_SIZE;
+        int col = ((int)pacman.x + 16) / TILE_SIZE;
+        int row = ((int)pacman.y + 16) / TILE_SIZE;
         
         if (row >= 0 && row < current_rows && col >= 0 && col < current_cols) {
             if (game_map[row][col] == 2) {

@@ -11,7 +11,6 @@ void setup_all_ghosts() {
     SDL_Color colors[GHOST_COUNT] = {
         {255, 0, 0, 255},   // Red 
         {255, 182, 85, 255} // Orange 
-        // {255,0,255,255}
     };
 
     for (int i = 0; i < GHOST_COUNT; i++) {
@@ -25,28 +24,17 @@ void move_all_ghosts() {
     for (int i = 0; i < GHOST_COUNT; i++) {
         if ((int)ghosts[i].x % TILE_SIZE == 0 && (int)ghosts[i].y % TILE_SIZE == 0) {
             
-            int tx, ty; // Target coordinates
-            if (i == 0) { 
-                tx = (int)pacman.x;
-                ty = (int)pacman.y;
-            } 
-            else {
-                //Ambush - Targets 4 tiles ahead of Pacman
-                tx = (int)pacman.x + (pacman.dx * TILE_SIZE * 4);
-                ty = (int)pacman.y + (pacman.dy * TILE_SIZE * 4);
-                if (tx < 0 || tx >= (current_cols * TILE_SIZE) || 
-                    ty < 0 || ty >= (current_rows * TILE_SIZE)) {
-                    tx = (int)pacman.x;
-                    ty = (int)pacman.y;
-                }
-            }
-            //pass knowledge
+            // All ghosts target Pacman's exact position
+            int tx = (int)pacman.x;
+            int ty = (int)pacman.y;
+
             get_smart_direction(i, tx, ty, &ghosts[i].dx, &ghosts[i].dy);
         }
-        //speed
+
         ghosts[i].x += ghosts[i].dx * GHOST_SPEED;
         ghosts[i].y += ghosts[i].dy * GHOST_SPEED;
 
+        // Trail of pellets logic
         int current_column = ((int)ghosts[i].x + 16) / TILE_SIZE;
         int current_row = ((int)ghosts[i].y + 16) / TILE_SIZE;
 

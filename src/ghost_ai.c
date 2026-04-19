@@ -2,34 +2,33 @@
 #include "../include/ghost_manager.h"
 #include "../include/entity.h"
 #include "../include/map.h"
-#include "../include/constants.h" 
+#include "../include/constants.h"
+#include <math.h>
 
 void get_smart_direction(int idx, int tx, int ty, int *ox, int *oy) {
-    int direction[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
-    float min_dist = 1e9f;
-    int bestIdx = -1;
+    int dir[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+    float best_dist = 1e9f; 
+    int best_idx = -1;
 
-    for (int j = 0; j < 4; j++){
+    for (int i = 0; i < 4; i++) {
+        int nx = (int)ghosts[idx].x + dir[i][0] * TILE_SIZE;
+        int ny = (int)ghosts[idx].y + dir[i][1] * TILE_SIZE;
 
-        int testX = (int)ghosts[idx].x + direction[j][0] * TILE_SIZE;
-        int testY = (int)ghosts[idx].y + direction[j][1] * TILE_SIZE;
+        if (check_wall(nx, ny)) continue;
 
-        if (check_wall(testX, testY))
-            continue;
-        if (direction[j][0] == -ghosts[idx].dx && direction[j][1] == -ghosts[idx].dy)
-            continue;
+        // Prevent 180-degree turns
+        if (dir[i][0] == -ghosts[idx].dx && dir[i][1] == -ghosts[idx].dy) continue;
 
-        float diffX = pacman.x - testX;
-        float diffY = pacman.y - testY;
-        float dist = (diffX * diffX) + (diffY * diffY);
+        float d = pow(tx - nx, 2) + pow(ty - ny, 2);
 
-        if (dist < min_dist){
-            min_dist = dist;
-            bestIdx = j;
+        if (d < best_dist) {
+            best_dist = d;
+            best_idx = i;
         }
     }
-    if (bestIdx != -1){
-        *ox = direction[bestIdx][0];
-        *oy = direction[bestIdx][1];
+
+    if (best_idx != -1) {
+        *ox = dir[best_idx][0];
+        *oy = dir[best_idx][1];
     }
 }

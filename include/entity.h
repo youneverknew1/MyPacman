@@ -13,7 +13,6 @@ typedef struct {
 
 extern Player pacman;
 
-// This line tells ALL files that check_wall exists!
 bool check_wall(int x, int y); 
 void move_player();
 void draw_player(SDL_Renderer* renderer);

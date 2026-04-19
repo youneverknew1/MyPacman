@@ -1,10 +1,12 @@
 #include <SDL2/SDL.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 #include "../include/constants.h"
 #include "../include/map.h"
 #include "../include/entity.h"
 #include "../include/ghost_manager.h"
 #include "../include/ui.h"
-#include <stdbool.h>
 
 GameState state = STATE_MENU;
 SDL_Window *win = NULL;
@@ -17,7 +19,7 @@ void spawn_entities() {
             if (game_map[r][c] == 3) {
                 pacman.x = (float)c * TILE_SIZE;
                 pacman.y = (float)r * TILE_SIZE;
-                game_map[r][c] = 0; 
+                game_map[r][c] = 0;
             } else if (game_map[r][c] == 4 && g_idx < GHOST_COUNT) {
                 ghosts[g_idx].x = (float)c * TILE_SIZE;
                 ghosts[g_idx].y = (float)r * TILE_SIZE;
@@ -33,9 +35,7 @@ void reset() {
         int w = current_cols * TILE_SIZE;
         int h = current_rows * TILE_SIZE;
         SDL_SetWindowSize(win, w, h);
-        
-        SDL_RenderSetLogicalSize(ren, w, h); 
-        
+        SDL_RenderSetLogicalSize(ren, w, h);
         setup_all_ghosts();
         spawn_entities();
         pacman.dx = pacman.dy = pacman.next_dx = pacman.next_dy = 0;
@@ -44,16 +44,17 @@ void reset() {
 }
 
 int main(int argc, char *argv[]) {
+    srand(time(NULL));
     SDL_Init(SDL_INIT_VIDEO);
-
+    
     win = SDL_CreateWindow("Pacman", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_SHOWN);
     ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
+    
     reset();
     
     bool run = true;
     SDL_Event event;
-
+    
     while (run) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) run = false;
@@ -73,7 +74,9 @@ int main(int argc, char *argv[]) {
         if (state == STATE_PLAY) {
             move_player();
             move_all_ghosts();
-            if (check_pacman_collision()) state = STATE_OVER;
+            if (check_pacman_collision()) {
+                state = STATE_OVER;
+            }
         }
 
         SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
@@ -88,6 +91,7 @@ int main(int argc, char *argv[]) {
         if (state == STATE_OVER) draw_game_over_screen(ren, score);
 
         SDL_RenderPresent(ren);
+        SDL_Delay(16);
     }
 
     SDL_DestroyRenderer(ren);
