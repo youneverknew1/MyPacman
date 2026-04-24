@@ -10,7 +10,8 @@ Ghost ghosts[GHOST_COUNT];
 void setup_all_ghosts() {
     SDL_Color colors[GHOST_COUNT] = {
         {255, 0, 0, 255},   // Red 
-        {255, 182, 85, 255} // Orange 
+        {255, 182, 85, 255} // Orange
+        // {255, 0,255,255},
     };
 
     for (int i = 0; i < GHOST_COUNT; i++) {
