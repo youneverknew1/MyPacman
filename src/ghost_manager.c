@@ -32,9 +32,35 @@ void setup_all_ghosts() {
     }
 }
 
+// void move_all_ghosts() {
+//     for (int i = 0; i < active_ghosts; i++) {
+//         // Only allow a turn if the ghost is perfectly centered on a tile
+//         if ((int)ghosts[i].x % TILE_SIZE == 0 && (int)ghosts[i].y % TILE_SIZE == 0) {
+//             int next_dx, next_dy;
+//             get_smart_direction(i, (int)pacman.x, (int)pacman.y, &next_dx, &next_dy);
+
+//             int target_col = ((int)ghosts[i].x / TILE_SIZE) + next_dx;
+//             int target_row = ((int)ghosts[i].y / TILE_SIZE) + next_dy;
+
+//             // Boundary check to prevent crashing on map edges
+//             if (target_row >= 0 && target_row < current_rows && target_col >= 0 && target_col < current_cols) {
+//                 if (game_map[target_row][target_col] != 1) {
+//                     ghosts[i].dx = next_dx;
+//                     ghosts[i].dy = next_dy;
+//                 }
+//             }
+//         }
+        
+//         ghosts[i].x += ghosts[i].dx * GHOST_SPEED;
+//         ghosts[i].y += ghosts[i].dy * GHOST_SPEED;
+//     }
+// }
 void move_all_ghosts() {
     for (int i = 0; i < active_ghosts; i++) {
-        // Only allow a turn if the ghost is perfectly centered on a tile
+        // Skip ghosts that are parked off-screen
+        if (ghosts[i].x < 0) continue;
+
+        // 1. Direction logic: Only change direction at tile intersections
         if ((int)ghosts[i].x % TILE_SIZE == 0 && (int)ghosts[i].y % TILE_SIZE == 0) {
             int next_dx, next_dy;
             get_smart_direction(i, (int)pacman.x, (int)pacman.y, &next_dx, &next_dy);
@@ -42,7 +68,7 @@ void move_all_ghosts() {
             int target_col = ((int)ghosts[i].x / TILE_SIZE) + next_dx;
             int target_row = ((int)ghosts[i].y / TILE_SIZE) + next_dy;
 
-            // Boundary check to prevent crashing on map edges
+            // Boundary check
             if (target_row >= 0 && target_row < current_rows && target_col >= 0 && target_col < current_cols) {
                 if (game_map[target_row][target_col] != 1) {
                     ghosts[i].dx = next_dx;
@@ -51,11 +77,24 @@ void move_all_ghosts() {
             }
         }
         
+        // 2. Move the ghost
         ghosts[i].x += ghosts[i].dx * GHOST_SPEED;
         ghosts[i].y += ghosts[i].dy * GHOST_SPEED;
+
+        // 3. --- GHOSTS LEAVE PELLETS ---
+        // Calculate the tile coordinates based on the ghost's center
+        int center_x = ((int)ghosts[i].x + TILE_SIZE / 2) / TILE_SIZE;
+        int center_y = ((int)ghosts[i].y + TILE_SIZE / 2) / TILE_SIZE;
+
+        // Verify we are within map bounds
+        if (center_y >= 0 && center_y < current_rows && center_x >= 0 && center_x < current_cols) {
+            // If the ghost is over an empty path (2), convert it back to a pellet (0)
+            if (game_map[center_y][center_x] == 0) {
+                game_map[center_y][center_x] = 2;
+            }
+        }
     }
 }
-
 void draw_all_ghosts(SDL_Renderer* renderer) {
     for (int i = 0; i < active_ghosts; i++) {
         // Safety check: don't draw if they are still "parked" off-screen

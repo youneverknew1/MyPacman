@@ -10,6 +10,8 @@
 
 int current_level = 1;
 int active_ghosts = 2; // Start with 2
+int level_flash_timer=0;
+
 GameState state = STATE_MENU;
 SDL_Window *win = NULL;
 SDL_Renderer *ren = NULL;
@@ -56,6 +58,7 @@ void add_new_ghost() {
 void level_up() {
     current_level++;
     add_new_ghost(); // Just adds a ghost, doesn't move anyone else
+    level_flash_timer=90;
 }
 
 void reset() {
@@ -68,7 +71,7 @@ void reset() {
         score = 0;
         current_level = 1;
         active_ghosts = 2; 
-        
+        level_flash_timer=0;
         setup_all_ghosts();
         spawn_entities();
         pacman.dx = pacman.dy = pacman.next_dx = pacman.next_dy = 0;
@@ -114,8 +117,13 @@ int main(int argc, char *argv[]) {
         draw_all_ghosts(ren);
         draw_ui_score(ren, score, 20, 10);
         draw_ui_level(ren, current_level, 20, 40);
+        if (level_flash_timer > 0 && state == STATE_PLAY) {
+            draw_level_up_flash(ren, current_level);
+            level_flash_timer--;
+        }
         if (state == STATE_MENU) draw_start_screen(ren);
         if (state == STATE_OVER) draw_game_over_screen(ren, score);
+        
         SDL_RenderPresent(ren);
         SDL_Delay(16);
     }

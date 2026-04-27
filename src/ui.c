@@ -84,3 +84,29 @@ void draw_ui_level(SDL_Renderer *ren, int level, int x, int y) {
     sprintf(buf, "LEVEL %d", level);
     draw_text(ren, buf, x, y, 2); // main.c passes y=40 to put it below Score
 }
+void draw_level_up_flash(SDL_Renderer *ren, int level) {
+    // 1. Dim the background slightly for focus
+    SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(ren, 0, 0, 0, 100); // semi-transparent black
+    SDL_Rect overlay = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+    SDL_RenderFillRect(ren, &overlay);
+
+    // 2. Prepare the text
+    char buf[16];
+    sprintf(buf, "LEVEL %d", level);
+
+    // 3. Center calculation
+    // "LEVEL X" is about 7 characters. 
+    // In draw_text, each char is sz*3 wide + sz*1 space = sz*4.
+    int fontSize = 8; // Make it big!
+    int textWidth = strlen(buf) * (fontSize * 4);
+    int startX = (SCREEN_WIDTH / 2) - (textWidth / 2);
+    int startY = (SCREEN_HEIGHT / 2) - (fontSize * 2);
+
+    // 4. Draw with a yellow "flash" color
+    SDL_SetRenderDrawColor(ren, 255, 255, 0, 255); 
+    draw_text(ren, "LEVEL UP", (SCREEN_WIDTH / 2) - 80, startY - 60, 5);
+    
+    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255); // White for the number
+    draw_text(ren, buf, startX, startY, fontSize);
+}
