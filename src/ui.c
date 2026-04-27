@@ -73,9 +73,14 @@ void draw_game_over_screen(SDL_Renderer *ren, int score_val) {
     draw_text(ren, "R TO RETRY", SCREEN_WIDTH/2 - 70, SCREEN_HEIGHT/2 + 60, 3);
 }
 
-void draw_ui_score(SDL_Renderer *ren, int val, int x, int y) {
-    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-    char buf[16];
-    sprintf(buf, "SCORE : %04d", val); // This converts the number to "SCORE 0000"
-    draw_text(ren, buf, x, y, 3);    // sz=3 is better for full screen
+void draw_ui_score(SDL_Renderer *ren, int score, int x, int y) {
+    char buf[32];
+    sprintf(buf, "SCORE %04d", score);
+    draw_text(ren, buf, x, y, 2);
+}
+
+void draw_ui_level(SDL_Renderer *ren, int level, int x, int y) {
+    char buf[32];
+    sprintf(buf, "LEVEL %d", level);
+    draw_text(ren, buf, x, y, 2); // main.c passes y=40 to put it below Score
 }

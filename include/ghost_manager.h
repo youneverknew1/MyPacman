@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-#define GHOST_COUNT 4
+#define GHOST_COUNT 10
 #define GHOST_SPEED 2
 
 typedef struct {
