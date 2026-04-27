@@ -26,6 +26,62 @@ static const int font[36][15] = {
     {1,1,1,1,0,1,1,1,1,1,0,1,1,1,1}, {1,1,1,1,0,1,1,1,1,0,0,1,1,1,1}  // 8, 9
 };
 
+// --- INTERNAL HELPERS ---
+
+
+
+// Unified Centering Logic for Overlays
+void draw_centered_ui(SDL_Renderer *ren, const char* main_txt, const char* sub_txt, SDL_Color color) {
+    // 1. Dim background
+    SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(ren, 0, 0, 0, 160);
+    SDL_Rect r = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+    SDL_RenderFillRect(ren, &r);
+
+    // 2. Draw Main Header (Centered)
+    SDL_SetRenderDrawColor(ren, color.r, color.g, color.b, 255);
+    int main_sz = 6;
+    int main_x = (SCREEN_WIDTH / 2) - (strlen(main_txt) * (main_sz * 2));
+    draw_text(ren, main_txt, main_x, SCREEN_HEIGHT / 2 - 50, main_sz);
+
+    // 3. Draw Subtext (Centered)
+    if (sub_txt) {
+        SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+        int sub_sz = 3;
+        int sub_x = (SCREEN_WIDTH / 2) - (strlen(sub_txt) * (sub_sz * 2));
+        draw_text(ren, sub_txt, sub_x, SCREEN_HEIGHT / 2 + 30, sub_sz);
+    }
+}
+
+// --- PUBLIC FUNCTIONS ---
+
+void draw_start_screen(SDL_Renderer *ren) {
+    draw_centered_ui(ren, "SHADID'S PACMAN", "SPACE TO START", (SDL_Color){255, 255, 0, 255});
+}
+
+void draw_game_over_screen(SDL_Renderer *ren, int score_val) {
+    char buf[32];
+    sprintf(buf, "SCORE %04d - R TO RETRY", score_val);
+    draw_centered_ui(ren, "GAME OVER", buf, (SDL_Color){255, 0, 0, 255});
+}
+
+void draw_level_up_flash(SDL_Renderer *ren, int level) {
+    char buf[16];
+    sprintf(buf, "LEVEL %d", level);
+    draw_centered_ui(ren, "LEVEL UP", buf, (SDL_Color){0, 255, 255, 255}); // Cyan flash
+}
+
+void draw_ui_score(SDL_Renderer *ren, int score, int x, int y) {
+    char buf[16]; sprintf(buf, "SCORE %04d", score);
+    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+    draw_text(ren, buf, x, y, 2);
+}
+
+void draw_ui_level(SDL_Renderer *ren, int level, int x, int y) {
+    char buf[16]; sprintf(buf, "LEVEL %d", level);
+    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+    draw_text(ren, buf, x, y, 2);
+}
 void draw_char(SDL_Renderer *ren, char c, int x, int y, int sz) {
     int idx = -1;
     if (c >= 'A' && c <= 'Z') idx = c - 'A';
@@ -44,69 +100,6 @@ void draw_char(SDL_Renderer *ren, char c, int x, int y, int sz) {
 void draw_text(SDL_Renderer *ren, const char* txt, int x, int y, int sz) {
     for (int i = 0; txt[i] != '\0'; i++) {
         if (txt[i] != ' ') draw_char(ren, txt[i], x, y, sz);
-        x += sz * 4; // Space between letters
+        x += sz * 4; 
     }
-}
-
-void draw_overlay(SDL_Renderer *ren, SDL_Color col) {
-    SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
-    SDL_SetRenderDrawColor(ren, 0, 0, 0, 180);
-    SDL_Rect r = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-    SDL_RenderFillRect(ren, &r);
-    SDL_SetRenderDrawColor(ren, col.r, col.g, col.b, 255);
-}
-
-void draw_start_screen(SDL_Renderer *ren) {
-    draw_overlay(ren, (SDL_Color){255, 255, 0, 255});
-    draw_text(ren, "PACMAN", SCREEN_WIDTH/2 - 70, SCREEN_HEIGHT/2 - 40, 6);
-    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-    draw_text(ren, "SPACE TO START", SCREEN_WIDTH/2 - 110, SCREEN_HEIGHT/2 + 40, 3);
-}
-
-void draw_game_over_screen(SDL_Renderer *ren, int score_val) {
-    draw_overlay(ren, (SDL_Color){255, 0, 0, 255});
-    draw_text(ren, "GAME OVER", SCREEN_WIDTH/2 - 90, SCREEN_HEIGHT/2 - 60, 6);
-    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-    char buf[20];
-    sprintf(buf, "SCORE %04d", score_val);
-    draw_text(ren, buf, SCREEN_WIDTH/2 - 80, SCREEN_HEIGHT/2, 4);
-    draw_text(ren, "R TO RETRY", SCREEN_WIDTH/2 - 70, SCREEN_HEIGHT/2 + 60, 3);
-}
-
-void draw_ui_score(SDL_Renderer *ren, int score, int x, int y) {
-    char buf[32];
-    sprintf(buf, "SCORE %04d", score);
-    draw_text(ren, buf, x, y, 2);
-}
-
-void draw_ui_level(SDL_Renderer *ren, int level, int x, int y) {
-    char buf[32];
-    sprintf(buf, "LEVEL %d", level);
-    draw_text(ren, buf, x, y, 2); // main.c passes y=40 to put it below Score
-}
-void draw_level_up_flash(SDL_Renderer *ren, int level) {
-    // 1. Dim the background slightly for focus
-    SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
-    SDL_SetRenderDrawColor(ren, 0, 0, 0, 100); // semi-transparent black
-    SDL_Rect overlay = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-    SDL_RenderFillRect(ren, &overlay);
-
-    // 2. Prepare the text
-    char buf[16];
-    sprintf(buf, "LEVEL %d", level);
-
-    // 3. Center calculation
-    // "LEVEL X" is about 7 characters. 
-    // In draw_text, each char is sz*3 wide + sz*1 space = sz*4.
-    int fontSize = 8; // Make it big!
-    int textWidth = strlen(buf) * (fontSize * 4);
-    int startX = (SCREEN_WIDTH / 2) - (textWidth / 2);
-    int startY = (SCREEN_HEIGHT / 2) - (fontSize * 2);
-
-    // 4. Draw with a yellow "flash" color
-    SDL_SetRenderDrawColor(ren, 255, 255, 0, 255); 
-    draw_text(ren, "LEVEL UP", (SCREEN_WIDTH / 2) - 80, startY - 60, 5);
-    
-    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255); // White for the number
-    draw_text(ren, buf, startX, startY, fontSize);
 }
