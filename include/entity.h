@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
-#define PACMAN_SPEED 2
+#define PACMAN_SPEED 2.0f
 typedef struct {
     float x, y;
     int dx, dy;
