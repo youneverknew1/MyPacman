@@ -36,6 +36,7 @@ void reset() {
         int h = current_rows * TILE_SIZE;
         SDL_SetWindowSize(win, w, h);
         SDL_RenderSetLogicalSize(ren, w, h);
+        SDL_RenderSetIntegerScale(ren,SDL_TRUE);
         setup_all_ghosts();
         spawn_entities();
         pacman.dx = pacman.dy = pacman.next_dx = pacman.next_dy = 0;

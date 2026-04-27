@@ -75,7 +75,7 @@ void draw_game_over_screen(SDL_Renderer *ren, int score_val) {
 
 void draw_ui_score(SDL_Renderer *ren, int val, int x, int y) {
     SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-    char buf[10];
-    sprintf(buf, "%04d", val);
-    draw_text(ren, buf, x, y, 4);
+    char buf[16];
+    sprintf(buf, "SCORE : %04d", val); // This converts the number to "SCORE 0000"
+    draw_text(ren, buf, x, y, 3);    // sz=3 is better for full screen
 }

@@ -10,8 +10,9 @@ Ghost ghosts[GHOST_COUNT];
 void setup_all_ghosts() {
     SDL_Color colors[GHOST_COUNT] = {
         {255, 0, 0, 255},   // Red 
-        {255, 182, 85, 255} // Orange
-        // {255, 0,255,255},
+        {255, 182, 85, 255},// Orange
+        {255, 0,255,255},
+        {0,255,0,255}
     };
 
     for (int i = 0; i < GHOST_COUNT; i++) {
@@ -23,28 +24,24 @@ void setup_all_ghosts() {
 
 void move_all_ghosts() {
     for (int i = 0; i < GHOST_COUNT; i++) {
+        // Only allow a turn if the ghost is perfectly centered on a tile
         if ((int)ghosts[i].x % TILE_SIZE == 0 && (int)ghosts[i].y % TILE_SIZE == 0) {
-            
-            // All ghosts target Pacman's exact position
-            int tx = (int)pacman.x;
-            int ty = (int)pacman.y;
+            int next_dx, next_dy;
+            get_smart_direction(i, (int)pacman.x, (int)pacman.y, &next_dx, &next_dy);
 
-            get_smart_direction(i, tx, ty, &ghosts[i].dx, &ghosts[i].dy);
-        }
+            // Look ahead: where would the ghost be?
+            int target_col = ((int)ghosts[i].x / TILE_SIZE) + next_dx;
+            int target_row = ((int)ghosts[i].y / TILE_SIZE) + next_dy;
 
-        ghosts[i].x += ghosts[i].dx * GHOST_SPEED;
-        ghosts[i].y += ghosts[i].dy * GHOST_SPEED;
-
-        // Trail of pellets logic
-        int current_column = ((int)ghosts[i].x + 16) / TILE_SIZE;
-        int current_row = ((int)ghosts[i].y + 16) / TILE_SIZE;
-
-        if (current_row >= 0 && current_row < current_rows &&
-            current_column >= 0 && current_column < current_cols) {
-            if (game_map[current_row][current_column] == 0) {
-                game_map[current_row][current_column] = 2; 
+            // Only change direction if the path is clear (not a wall '1')
+            if (game_map[target_row][target_col] != 1) {
+                ghosts[i].dx = next_dx;
+                ghosts[i].dy = next_dy;
             }
         }
+        
+        ghosts[i].x += ghosts[i].dx * GHOST_SPEED;
+        ghosts[i].y += ghosts[i].dy * GHOST_SPEED;
     }
 }
 
