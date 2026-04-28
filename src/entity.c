@@ -7,29 +7,39 @@
 Player pacman; 
 
 
-
 void move_player() {
-    for (int i = 0; i < PACMAN_SPEED; i++) {
+    static float fraction = 0.0f;
+    fraction += pacman_speed;
+    
+    // This while loop handles the "smooth" part. 
+    // If speed is 1.5, it moves 1 pixel this frame, 2 pixels the next.
+    while (fraction >= 1.0f) {
+        
+        // Alignment Check
         if ((int)pacman.x % TILE_SIZE == 0 && (int)pacman.y % TILE_SIZE == 0) {
             if (!check_wall((int)pacman.x + pacman.next_dx, (int)pacman.y + pacman.next_dy)) {
                 pacman.dx = pacman.next_dx;
                 pacman.dy = pacman.next_dy;
             }
         }
+
+        // Move 1 pixel
         if (!check_wall((int)pacman.x + pacman.dx, (int)pacman.y + pacman.dy)) {
             pacman.x += pacman.dx;
             pacman.y += pacman.dy;
         }
 
+        // Pellet Logic
         int col = ((int)pacman.x + 16) / TILE_SIZE;
         int row = ((int)pacman.y + 16) / TILE_SIZE;
-        
         if (row >= 0 && row < current_rows && col >= 0 && col < current_cols) {
             if (game_map[row][col] == 2) {
                 game_map[row][col] = 0;
                 score += 10;
             }
         }
+
+        fraction -= 1.0f;
     }
 }
 

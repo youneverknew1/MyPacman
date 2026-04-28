@@ -28,5 +28,5 @@ extern GameState state;
 extern int score;
 extern int lives;         // Added to track Pacman's health
 extern int current_level; // Added for the Level Up logic
-
+extern float pacman_speed;
 #endif // CONSTANTS_H
