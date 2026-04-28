@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #define GHOST_COUNT 10
-#define GHOST_SPEED 2
+#define GHOST_SPEED 2.0f
 
 typedef struct {
     float x, y;

@@ -12,7 +12,7 @@ void setup_all_ghosts() {
     // Defined a set of 10 distinct colors for the 10 levels
     SDL_Color colors[GHOST_COUNT] = {
         {255, 0, 0, 255},     // 1: Red
-        {255, 182, 85, 255},   // 2: Orange
+        {255, 182, 85, 255},  // 2: Orange
         {0, 255, 255, 255},   // 3: Cyan
         {255, 182, 255, 255}, // 4: Pink
         {50, 255, 50, 255},   // 5: Green

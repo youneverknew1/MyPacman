@@ -6,24 +6,7 @@
 
 Player pacman; 
 
-bool check_wall(int x, int y) {
-    if (x < 0 || y < 0 || 
-        (x + TILE_SIZE) > (current_cols * TILE_SIZE) || 
-        (y + TILE_SIZE) > (current_rows * TILE_SIZE)) {
-        return true; 
-    }
 
-    int left = x / TILE_SIZE;
-    int right = (x + TILE_SIZE - 1) / TILE_SIZE;
-    int top = y / TILE_SIZE;
-    int bottom = (y + TILE_SIZE - 1) / TILE_SIZE;
-
-    if (left < 0 || right >= current_cols || top < 0 || bottom >= current_rows) return true;
-    if (!game_map) return true;
-
-    return (game_map[top][left] == 1 || game_map[top][right] == 1 ||
-            game_map[bottom][left] == 1 || game_map[bottom][right] == 1);
-}
 
 void move_player() {
     for (int i = 0; i < PACMAN_SPEED; i++) {
@@ -54,4 +37,22 @@ void draw_player(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
     SDL_Rect r = {(int)pacman.x, (int)pacman.y, TILE_SIZE, TILE_SIZE};
     SDL_RenderFillRect(renderer, &r);
+}
+bool check_wall(int x, int y) {
+    if (x < 0 || y < 0 || 
+        (x + TILE_SIZE) > (current_cols * TILE_SIZE) || 
+        (y + TILE_SIZE) > (current_rows * TILE_SIZE)) {
+        return true; 
+    }
+
+    int left = x / TILE_SIZE;
+    int right = (x + TILE_SIZE - 1) / TILE_SIZE;
+    int top = y / TILE_SIZE;
+    int bottom = (y + TILE_SIZE - 1) / TILE_SIZE;
+
+    if (left < 0 || right >= current_cols || top < 0 || bottom >= current_rows) return true;
+    if (!game_map) return true;
+
+    return (game_map[top][left] == 1 || game_map[top][right] == 1 ||
+            game_map[bottom][left] == 1 || game_map[bottom][right] == 1);
 }

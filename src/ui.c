@@ -26,8 +26,6 @@ static const int font[36][15] = {
     {1,1,1,1,0,1,1,1,1,1,0,1,1,1,1}, {1,1,1,1,0,1,1,1,1,0,0,1,1,1,1}  // 8, 9
 };
 
-// --- INTERNAL HELPERS ---
-
 
 
 // Unified Centering Logic for Overlays
@@ -53,10 +51,10 @@ void draw_centered_ui(SDL_Renderer *ren, const char* main_txt, const char* sub_t
     }
 }
 
-// --- PUBLIC FUNCTIONS ---
+
 
 void draw_start_screen(SDL_Renderer *ren) {
-    draw_centered_ui(ren, "SHADID'S PACMAN", "SPACE TO START", (SDL_Color){255, 255, 0, 255});
+    draw_centered_ui(ren, "SHADIDs PACMAN", "SPACE TO START", (SDL_Color){255, 255, 0, 255});
 }
 
 void draw_game_over_screen(SDL_Renderer *ren, int score_val) {
