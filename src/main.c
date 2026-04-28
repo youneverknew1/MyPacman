@@ -141,11 +141,11 @@ int main(int argc, char *argv[]) {
         draw_map(ren);
         draw_player(ren);
         draw_all_ghosts(ren);
-        
+        int hud_y=10;
         // HUD
-        draw_ui_score(ren, score, 40, 15);     // Far Left
-        draw_ui_level(ren, current_level, 300, 15); // Middle-Left
-        draw_ui_lives(ren, lives, 550, 15);
+        draw_ui_score(ren, score, 40, hud_y);     // Far Left
+        draw_ui_level(ren, current_level, 300, hud_y); // Middle-Left
+        draw_ui_lives(ren, lives, 550, hud_y);
 
         if (level_flash_timer > 0 && state == STATE_PLAY) {
             draw_level_up_flash(ren, current_level);

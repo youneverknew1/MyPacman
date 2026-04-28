@@ -9,6 +9,7 @@ typedef struct {
     float x, y;
     int dx, dy;
     int next_dx, next_dy;
+    int anim_timer;
 } Player;
 
 extern Player pacman;

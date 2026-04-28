@@ -33,10 +33,38 @@ void move_player() {
     }
 }
 
-void draw_player(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-    SDL_Rect r = {(int)pacman.x, (int)pacman.y, TILE_SIZE, TILE_SIZE};
-    SDL_RenderFillRect(renderer, &r);
+void draw_player(SDL_Renderer *ren) {
+    int x = (int)pacman.x;
+    int y = (int)pacman.y;
+    
+    // Increment animation timer
+    pacman.anim_timer++;
+    if (pacman.anim_timer > 20) pacman.anim_timer = 0; // Reset every 20 frames
+
+    // Draw the main body
+    SDL_SetRenderDrawColor(ren, 255, 255, 0, 255); // Yellow
+    SDL_Rect body = { x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4 };
+    SDL_RenderFillRect(ren, &body);
+
+    // MOUTH LOGIC: Only "cut out" the mouth if timer is in the first 10 frames
+    if (pacman.anim_timer < 10 && (pacman.dx != 0 || pacman.dy != 0)) {
+        SDL_SetRenderDrawColor(ren, 0, 0, 0, 255); // Black (Matches background)
+        SDL_Rect mouth;
+        
+        int m_size = 12; // Size of the mouth opening
+        
+        if (pacman.dx > 0) { // Moving Right
+            mouth = (SDL_Rect){ x + TILE_SIZE - m_size, y + TILE_SIZE/2 - 4, m_size, 8 };
+        } else if (pacman.dx < 0) { // Moving Left
+            mouth = (SDL_Rect){ x, y + TILE_SIZE/2 - 4, m_size, 8 };
+        } else if (pacman.dy > 0) { // Moving Down
+            mouth = (SDL_Rect){ x + TILE_SIZE/2 - 4, y + TILE_SIZE - m_size, 8, m_size };
+        } else if (pacman.dy < 0) { // Moving Up
+            mouth = (SDL_Rect){ x + TILE_SIZE/2 - 4, y, 8, m_size };
+        }
+        
+        SDL_RenderFillRect(ren, &mouth);
+    }
 }
 bool check_wall(int x, int y) {
     if (x < 0 || y < 0 || 
