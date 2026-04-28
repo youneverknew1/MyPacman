@@ -26,60 +26,7 @@ static const int font[36][15] = {
     {1,1,1,1,0,1,1,1,1,1,0,1,1,1,1}, {1,1,1,1,0,1,1,1,1,0,0,1,1,1,1}  // 8, 9
 };
 
-
-
-// Unified Centering Logic for Overlays
-void draw_centered_ui(SDL_Renderer *ren, const char* main_txt, const char* sub_txt, SDL_Color color) {
-    // 1. Dim background
-    SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
-    SDL_SetRenderDrawColor(ren, 0, 0, 0, 160);
-    SDL_Rect r = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-    SDL_RenderFillRect(ren, &r);
-
-    // 2. Draw Main Header (Centered)
-    SDL_SetRenderDrawColor(ren, color.r, color.g, color.b, 255);
-    int main_sz = 6;
-    int main_x = (SCREEN_WIDTH / 2) - (strlen(main_txt) * (main_sz * 2));
-    draw_text(ren, main_txt, main_x, SCREEN_HEIGHT / 2 - 50, main_sz);
-
-    // 3. Draw Subtext (Centered)
-    if (sub_txt) {
-        SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-        int sub_sz = 3;
-        int sub_x = (SCREEN_WIDTH / 2) - (strlen(sub_txt) * (sub_sz * 2));
-        draw_text(ren, sub_txt, sub_x, SCREEN_HEIGHT / 2 + 30, sub_sz);
-    }
-}
-
-
-
-void draw_start_screen(SDL_Renderer *ren) {
-    draw_centered_ui(ren, "SHADIDs PACMAN", "SPACE TO START", (SDL_Color){255, 255, 0, 255});
-}
-
-void draw_game_over_screen(SDL_Renderer *ren, int score_val) {
-    char buf[32];
-    sprintf(buf, "SCORE %04d - R TO RETRY", score_val);
-    draw_centered_ui(ren, "GAME OVER", buf, (SDL_Color){255, 0, 0, 255});
-}
-
-void draw_level_up_flash(SDL_Renderer *ren, int level) {
-    char buf[16];
-    sprintf(buf, "LEVEL %d", level);
-    draw_centered_ui(ren, "LEVEL UP", buf, (SDL_Color){0, 255, 255, 255}); // Cyan flash
-}
-
-void draw_ui_score(SDL_Renderer *ren, int score, int x, int y) {
-    char buf[16]; sprintf(buf, "SCORE %04d", score);
-    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-    draw_text(ren, buf, x, y, 2);
-}
-
-void draw_ui_level(SDL_Renderer *ren, int level, int x, int y) {
-    char buf[16]; sprintf(buf, "LEVEL %d", level);
-    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-    draw_text(ren, buf, x, y, 2);
-}
+// Basic Character Drawing
 void draw_char(SDL_Renderer *ren, char c, int x, int y, int sz) {
     int idx = -1;
     if (c >= 'A' && c <= 'Z') idx = c - 'A';
@@ -95,9 +42,68 @@ void draw_char(SDL_Renderer *ren, char c, int x, int y, int sz) {
     }
 }
 
+// Basic Text Drawing
 void draw_text(SDL_Renderer *ren, const char* txt, int x, int y, int sz) {
     for (int i = 0; txt[i] != '\0'; i++) {
         if (txt[i] != ' ') draw_char(ren, txt[i], x, y, sz);
         x += sz * 4; 
     }
+}
+
+// Unified Centering Logic for Overlays
+void draw_centered_ui(SDL_Renderer *ren, const char* main_txt, const char* sub_txt, SDL_Color color) {
+    SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(ren, 0, 0, 0, 160);
+    SDL_Rect r = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+    SDL_RenderFillRect(ren, &r);
+
+    SDL_SetRenderDrawColor(ren, color.r, color.g, color.b, 255);
+    int main_sz = 6;
+    int main_x = (SCREEN_WIDTH / 2) - (strlen(main_txt) * (main_sz * 2));
+    draw_text(ren, main_txt, main_x, SCREEN_HEIGHT / 2 - 50, main_sz);
+
+    if (sub_txt) {
+        SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+        int sub_sz = 3;
+        int sub_x = (SCREEN_WIDTH / 2) - (strlen(sub_txt) * (sub_sz * 2));
+        draw_text(ren, sub_txt, sub_x, SCREEN_HEIGHT / 2 + 30, sub_sz);
+    }
+}
+
+// Public Screens
+void draw_start_screen(SDL_Renderer *ren) {
+    draw_centered_ui(ren, "SHADIDs PACMAN", "SPACE TO START", (SDL_Color){255, 255, 0, 255});
+}
+
+void draw_game_over_screen(SDL_Renderer *ren, int score_val) {
+    char buf[32];
+    sprintf(buf, "SCORE %04d - R TO RETRY", score_val);
+    draw_centered_ui(ren, "GAME OVER", buf, (SDL_Color){255, 0, 0, 255});
+}
+
+void draw_level_up_flash(SDL_Renderer *ren, int level) {
+    char buf[16];
+    sprintf(buf, "LEVEL %d", level);
+    draw_centered_ui(ren, "LEVEL UP", buf, (SDL_Color){0, 255, 255, 255});
+}
+
+// HUD Elements
+// Inside src/ui.c
+
+void draw_ui_score(SDL_Renderer *ren, int score, int x, int y) {
+    char buf[16]; sprintf(buf, "SCORE %04d", score);
+    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+    draw_text(ren, buf, x, y, 2);
+}
+
+void draw_ui_level(SDL_Renderer *ren, int level, int x, int y) {
+    char buf[16]; sprintf(buf, "LEVEL %d", level);
+    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+    draw_text(ren, buf, x, y, 2);
+}
+
+void draw_ui_lives(SDL_Renderer *ren, int lives, int x, int y) {
+    char buf[16]; sprintf(buf, "LIVES %d", lives);
+    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+    draw_text(ren, buf, x, y, 2);
 }

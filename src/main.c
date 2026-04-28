@@ -9,13 +9,15 @@
 #include "../include/ui.h"
 
 int current_level = 1;
-int active_ghosts = 2; // Start with 2
-int level_flash_timer=0;
+int active_ghosts = 2; 
+int level_flash_timer = 0;
+int lives = 3; // Initialized lives
 
 GameState state = STATE_MENU;
 SDL_Window *win = NULL;
 SDL_Renderer *ren = NULL;
 
+// Moves Pacman and active ghosts back to their starting spots from the map
 void spawn_entities() {
     int g_idx = 0;
     for (int r = 0; r < current_rows; r++) {
@@ -27,6 +29,8 @@ void spawn_entities() {
                 if (g_idx < active_ghosts) {
                     ghosts[g_idx].x = (float)c * TILE_SIZE;
                     ghosts[g_idx].y = (float)r * TILE_SIZE;
+                    ghosts[g_idx].dx = 0; // Stop movement on spawn
+                    ghosts[g_idx].dy = 0;
                     g_idx++;
                 }
             }
@@ -46,7 +50,7 @@ void add_new_ghost() {
                     ghosts[active_ghosts].y = (float)r * TILE_SIZE;
                     ghosts[active_ghosts].dx = 0;
                     ghosts[active_ghosts].dy = 0;
-                    active_ghosts++; // Now there's one more ghost
+                    active_ghosts++;
                     return;
                 }
                 found_spawns++;
@@ -57,10 +61,11 @@ void add_new_ghost() {
 
 void level_up() {
     current_level++;
-    add_new_ghost(); // Just adds a ghost, doesn't move anyone else
-    level_flash_timer=90;
+    add_new_ghost(); 
+    level_flash_timer = 90;
 }
 
+// Full Reset (Score and Level wiped)
 void reset() {
     if (load_map("assets/map.txt")) {
         int w = current_cols * TILE_SIZE;
@@ -71,7 +76,9 @@ void reset() {
         score = 0;
         current_level = 1;
         active_ghosts = 2; 
-        level_flash_timer=0;
+        lives = 3; // Reset lives back to 3
+        level_flash_timer = 0;
+        
         setup_all_ghosts();
         spawn_entities();
         pacman.dx = pacman.dy = pacman.next_dx = pacman.next_dy = 0;
@@ -81,7 +88,9 @@ void reset() {
 int main(int argc, char *argv[]) {
     srand(time(NULL));
     SDL_Init(SDL_INIT_VIDEO);
-    win = SDL_CreateWindow("Pacman", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_SHOWN);
+    
+    // Initial window size will be corrected by reset()
+    win = SDL_CreateWindow("SHADIDs PACMAN", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_SHOWN);
     ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     
     reset();
@@ -94,6 +103,7 @@ int main(int argc, char *argv[]) {
             if (event.type == SDL_KEYDOWN) {
                 if (state == STATE_MENU && event.key.keysym.sym == SDLK_SPACE) state = STATE_PLAY;
                 if (state == STATE_OVER && event.key.keysym.sym == SDLK_r) { reset(); state = STATE_PLAY; }
+                
                 if (state == STATE_PLAY) {
                     if (event.key.keysym.sym == SDLK_UP)    { pacman.next_dx = 0;  pacman.next_dy = -1; }
                     if (event.key.keysym.sym == SDLK_DOWN)  { pacman.next_dx = 0;  pacman.next_dy = 1;  }
@@ -106,27 +116,51 @@ int main(int argc, char *argv[]) {
         if (state == STATE_PLAY) {
             move_player();
             move_all_ghosts();
+            
+            // Check for level up
             if (score >= current_level * 500) level_up();
-            if (check_pacman_collision()) state = STATE_OVER;
+            
+            // LIVES LOGIC
+            if (check_pacman_collision()) {
+                lives--;
+                if (lives <= 0) {
+                    state = STATE_OVER;
+                } else {
+                    // Soft Reset: Keep score and level, but move characters back
+                    spawn_entities();
+                    pacman.dx = pacman.dy = pacman.next_dx = pacman.next_dy = 0;
+                    SDL_Delay(1000); // Wait 1 second before resuming
+                }
+            }
         }
 
+        // --- DRAWING ---
         SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
         SDL_RenderClear(ren);
+        
         draw_map(ren);
         draw_player(ren);
         draw_all_ghosts(ren);
-        draw_ui_score(ren, score, 20, 10);
-        draw_ui_level(ren, current_level, 20, 40);
+        
+        // HUD
+        draw_ui_score(ren, score, 40, 15);     // Far Left
+        draw_ui_level(ren, current_level, 300, 15); // Middle-Left
+        draw_ui_lives(ren, lives, 550, 15);
+
         if (level_flash_timer > 0 && state == STATE_PLAY) {
             draw_level_up_flash(ren, current_level);
             level_flash_timer--;
         }
+
         if (state == STATE_MENU) draw_start_screen(ren);
         if (state == STATE_OVER) draw_game_over_screen(ren, score);
         
         SDL_RenderPresent(ren);
         SDL_Delay(16);
     }
+
+    SDL_DestroyRenderer(ren);
+    SDL_DestroyWindow(win);
     SDL_Quit();
     return 0;
 }
