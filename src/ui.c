@@ -102,8 +102,33 @@ void draw_ui_level(SDL_Renderer *ren, int level, int x, int y) {
     draw_text(ren, buf, x, y, 2);
 }
 
-void draw_ui_lives(SDL_Renderer *ren, int lives, int x, int y) {
-    char buf[16]; sprintf(buf, "LIVES %d", lives);
+void draw_heart(SDL_Renderer *ren, int x, int y, int sz) {
+    SDL_SetRenderDrawColor(ren, 255, 0, 0, 255); // Red hearts!
+
+    // A heart made of 5 rectangles (3x3 grid style)
+    // Left "hump"
+    SDL_Rect left_top = { x, y, sz, sz };
+    // Right "hump"
+    SDL_Rect right_top = { x + sz * 2, y, sz, sz };
+    // Middle row
+    SDL_Rect mid = { x, y + sz, sz * 3, sz };
+    // Bottom point
+    SDL_Rect bottom = { x + sz, y + sz * 2, sz, sz };
+
+    SDL_RenderFillRect(ren, &left_top);
+    SDL_RenderFillRect(ren, &right_top);
+    SDL_RenderFillRect(ren, &mid);
+    SDL_RenderFillRect(ren, &bottom);
+}
+
+void draw_ui_lives(SDL_Renderer *ren, int lives_count, int x, int y) {
+    // First, draw the label "LIVES"
     SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-    draw_text(ren, buf, x, y, 2);
+    draw_text(ren, "LIVES", x, y, 2);
+
+    // Then, draw heart shapes next to it
+    int heart_x_start = x + 100; // Start hearts after the word "LIVES"
+    for (int i = 0; i < lives_count; i++) {
+        draw_heart(ren, heart_x_start + (i * 30), y - 2, 6);
+    }
 }
