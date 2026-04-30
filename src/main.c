@@ -11,8 +11,13 @@
 int current_level = 1;
 int active_ghosts = 2;
 int level_flash_timer = 0;
-int lives = 3; 
-float pacman_speed = 1.80f; // Base speed starting at 2.0
+
+// --- LIVES SETTINGS ---
+int lives = 1;                // Start with 1 life as requested
+int score_to_next_life = 800; // First milestone
+int life_increment = 600;     // Each life costs 600 more than the last
+int life_flash_timer = 0;
+float pacman_speed = 1.80f; // Base speed
 GameState state = STATE_MENU;
 SDL_Window *win = NULL;
 SDL_Renderer *ren = NULL;
@@ -35,7 +40,7 @@ void spawn_entities()
                 {
                     ghosts[g_idx].x = (float)c * TILE_SIZE;
                     ghosts[g_idx].y = (float)r * TILE_SIZE;
-                    ghosts[g_idx].dx = 0; 
+                    ghosts[g_idx].dx = 0;
                     ghosts[g_idx].dy = 0;
                     g_idx++;
                 }
@@ -48,7 +53,6 @@ void add_new_ghost()
 {
     if (active_ghosts >= GHOST_COUNT)
         return;
-
     int found_spawns = 0;
     for (int r = 0; r < current_rows; r++)
     {
@@ -75,10 +79,7 @@ void level_up()
 {
     current_level++;
     add_new_ghost();
-    
-    // INCREASE SPEED: Adds 0.3 to Pacman's speed every level up
-    pacman_speed += 0.2f; 
-    
+    pacman_speed += 0.2f; // Smooth speed increase
     level_flash_timer = 90;
 }
 
@@ -94,11 +95,14 @@ void reset()
         score = 0;
         current_level = 1;
         active_ghosts = 2;
-        lives = 3; 
+
+        // --- RESET LIVES PROGRESSION ---
+        lives = 1;
+        score_to_next_life = 800;
+        life_flash_timer=0;
+
         level_flash_timer = 0;
-        
-        // RESET SPEED: Back to base speed on full reset
-        pacman_speed = 1.8f; 
+        pacman_speed = 1.8f;
 
         setup_all_ghosts();
         spawn_entities();
@@ -133,21 +137,44 @@ int main(int argc, char *argv[])
                     reset();
                     state = STATE_PLAY;
                 }
-
                 if (state == STATE_PLAY)
                 {
-                    if (event.key.keysym.sym == SDLK_UP) { pacman.next_dx = 0; pacman.next_dy = -1; }
-                    if (event.key.keysym.sym == SDLK_DOWN) { pacman.next_dx = 0; pacman.next_dy = 1; }
-                    if (event.key.keysym.sym == SDLK_LEFT) { pacman.next_dx = -1; pacman.next_dy = 0; }
-                    if (event.key.keysym.sym == SDLK_RIGHT) { pacman.next_dx = 1; pacman.next_dy = 0; }
+                    if (event.key.keysym.sym == SDLK_UP)
+                    {
+                        pacman.next_dx = 0;
+                        pacman.next_dy = -1;
+                    }
+                    if (event.key.keysym.sym == SDLK_DOWN)
+                    {
+                        pacman.next_dx = 0;
+                        pacman.next_dy = 1;
+                    }
+                    if (event.key.keysym.sym == SDLK_LEFT)
+                    {
+                        pacman.next_dx = -1;
+                        pacman.next_dy = 0;
+                    }
+                    if (event.key.keysym.sym == SDLK_RIGHT)
+                    {
+                        pacman.next_dx = 1;
+                        pacman.next_dy = 0;
+                    }
                 }
             }
         }
 
         if (state == STATE_PLAY)
         {
-            move_player(); // This function should use the global pacman_speed variable
+            move_player();
             move_all_ghosts();
+
+            // --- PROGRESSIVE LIVES LOGIC ---
+            if (score >= score_to_next_life)
+            {
+                lives++;
+                score_to_next_life += life_increment; // Next at 1600, then 2200...
+                life_flash_timer = 60;
+            }
 
             if (score >= current_level * 500)
                 level_up();
@@ -163,7 +190,7 @@ int main(int argc, char *argv[])
                 {
                     spawn_entities();
                     pacman.dx = pacman.dy = pacman.next_dx = pacman.next_dy = 0;
-                    SDL_Delay(1000); 
+                    SDL_Delay(1000);
                 }
             }
         }
@@ -175,19 +202,27 @@ int main(int argc, char *argv[])
         draw_player(ren);
         draw_all_ghosts(ren);
 
-        int hud_y = 15; 
+        // --- HUD POSITIONING ---
+        int hud_y = 15;
         draw_ui_score(ren, score, 40, hud_y);
         draw_ui_level(ren, current_level, 400, hud_y);
-        draw_ui_lives(ren, lives, 750, hud_y); 
-        
+        draw_ui_lives(ren, lives, 750, hud_y);
+
+        if (life_flash_timer > 0)
+        {
+            draw_life_flash(ren);
+            life_flash_timer--;
+        }
         if (level_flash_timer > 0 && state == STATE_PLAY)
         {
             draw_level_up_flash(ren, current_level);
             level_flash_timer--;
         }
 
-        if (state == STATE_MENU) draw_start_screen(ren);
-        if (state == STATE_OVER) draw_game_over_screen(ren, score);
+        if (state == STATE_MENU)
+            draw_start_screen(ren);
+        if (state == STATE_OVER)
+            draw_game_over_screen(ren, score);
 
         SDL_RenderPresent(ren);
         SDL_Delay(16);

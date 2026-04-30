@@ -91,17 +91,35 @@ void draw_centered_ui(SDL_Renderer *ren, const char* main_txt, const char* sub_t
 void draw_start_screen(SDL_Renderer *ren) { draw_centered_ui(ren, "SHADIDS PACMAN", "SPACE TO START", (SDL_Color){255, 255, 0, 255}); }
 void draw_game_over_screen(SDL_Renderer *ren, int s) { char buf[32]; sprintf(buf, "SCORE %04d - R TO RETRY", s); draw_centered_ui(ren, "GAME OVER", buf, (SDL_Color){255, 0, 0, 255}); }
 void draw_level_up_flash(SDL_Renderer *ren, int l) {
-    char level_buf[16]; 
+    char level_buf[32]; 
     sprintf(level_buf, "LEVEL %d", l);
     
-    // Main Level Up message
     draw_centered_ui(ren, "LEVEL UP", level_buf, (SDL_Color){0, 255, 255, 255}); 
     
-    // Additional Speed Message
-    // We place this slightly lower (y + 100) and use a smaller font size (2)
-    SDL_SetRenderDrawColor(ren, 255, 255, 0, 255); // Yellow text for the bonus
-    const char* speed_msg = "+0.2 SPEED INCREASE";
-    draw_text(ren, speed_msg, 
-              (SCREEN_WIDTH / 2) - (strlen(speed_msg) * 4), 
-              (SCREEN_HEIGHT / 2) + 80, 2);
+    // Speed Message
+    SDL_SetRenderDrawColor(ren, 255, 255, 0, 255);
+    draw_text(ren, "+0.2 SPEED INCREASE", (SCREEN_WIDTH/2) - 160, (SCREEN_HEIGHT/2) + 60, 2);
+
 }
+void draw_life_flash(SDL_Renderer *ren) {
+    // 1. Same orientation/logic as Level Flash: Darken the background
+    SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(ren, 0, 0, 0, 180); // Slightly darker for impact
+    SDL_Rect full_screen = {0, 0, current_cols * TILE_SIZE, current_rows * TILE_SIZE};
+    SDL_RenderFillRect(ren, &full_screen);
+
+    // 2. Big Gold Main Text (Size 6 for that "BIG FLASH" feel)
+    SDL_SetRenderDrawColor(ren, 255, 215, 0, 255); // Gold/Yellow
+    const char* main_txt = "LIFE ATTAINED";
+    // Centering logic: (Total Width / 2) - (Length * (CharWidth * Size) / 2)
+    int main_x = (current_cols * TILE_SIZE / 2) - (strlen(main_txt) * 12);
+    int main_y = (current_rows * TILE_SIZE / 2) - 40;
+    draw_text(ren, main_txt, main_x, main_y, 6);
+
+    // 3. Smaller White Sub-Text (Same orientation as your Level X text)
+    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255); // White
+    const char* sub_txt = "EXTRA HEART ADDED";
+    int sub_x = (current_cols * TILE_SIZE / 2) - (strlen(sub_txt) * 6);
+    int sub_y = main_y + 80; // Positioned below the main text
+    draw_text(ren, sub_txt, sub_x, sub_y, 3);
+}// Ensure this closing brace is here!
